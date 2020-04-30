@@ -1,5 +1,5 @@
 ## Micro Paint 
-### Image processing and manipulation software for .pam and .bmp<br/><br/>
+### Image editing and manipulation software for .pam and .bmp<br/><br/>
 ##### Layers - overlay and blend 
 ##### Selections - overlap and interaction
 ##### Operations - 20+ image operations implemented, the user is allowed to make his own composite operations
