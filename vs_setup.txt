@@ -1,0 +1,14 @@
+1. Make new Empty C++ Visual Studio project
+2. Add main.cpp and compile it
+3. Copy deps folder to your project directory(outer folder)
+4. Copy SDL2.dll from Debug to project's outer Debug folder
+5. In project properties/vc++ directories/ do:
+	1. Add include directory xxxproject/deps/include
+	2. Add library directory xxxproject/deps/lib
+6. In project properties go to linker/input/
+	add additional dependencies  SDL2.lib  ,  SDL2main.lib
+7. Delete main.cpp (or other util)
+8. Copy all files from /src and /h to your inner project directory
+9. Manually add existing items in Source Files and Header Files
+10. Copy /res folder to inner project directory
+11. ENJOY!
