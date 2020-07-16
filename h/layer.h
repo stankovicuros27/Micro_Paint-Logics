@@ -29,10 +29,11 @@ public:
 	void perform_operation_whole_layer(Operation& operation);
 
 	std::string path;
+	SDL_Rect rect_;
 
 private:
 	SDL_Surface* surface_ = nullptr;
-	SDL_Rect rect_;
+
 	SDL_Rect creation_rect_;
 	Image* my_image_;
 

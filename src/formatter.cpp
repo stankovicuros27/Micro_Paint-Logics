@@ -144,6 +144,8 @@ void Formatter::export_project(Image* image, const std::string& path, std::strin
 
 		XMLElement* layer = xml_doc.NewElement("Layer");
 		layer->SetAttribute("Path", layerfile.c_str());
+		layer->SetAttribute("x", 0);
+		layer->SetAttribute("y", 0);
 		layer_list->InsertEndChild(layer);
 	});
 
@@ -191,7 +193,9 @@ Image* Formatter::import_project(std::string filename) {
 	while (layer != nullptr) {
 		std::string imgpath;
 		imgpath = layer->Attribute("Path");
-		image->add_layer(0, 0, imgpath, 100);
+		int x = atoi(layer->Attribute("x"));
+		int y = atoi(layer->Attribute("y"));
+		image->add_layer(x, y, imgpath, 100);
 		layer = layer->NextSiblingElement("Layer");
 	}
 
