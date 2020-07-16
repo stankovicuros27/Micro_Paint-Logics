@@ -21,6 +21,7 @@ void Formatter::import_bmp(SDL_Surface** surface, std::string path) {
 	*surface = SDL_LoadBMP(path.c_str());
 	if ((*surface) == nullptr) {
 		std::cerr << "BMP Image could not be imported! SDL_Error: " << SDL_GetError() << std::endl;
+		exit(-1);
 		throw Exception("Invalid BMP File!");
 	}
 	SDL_SetColorKey(*surface, SDL_TRUE, SDL_PIXELFORMAT_RGBA32);
@@ -30,6 +31,7 @@ bool Formatter::export_bmp(SDL_Surface* surface, std::string path) {
 	if (SDL_SaveBMP(surface, path.c_str()) < 0)
 	{
 		std::cout << "BMP Image could not be exported! SDL_Error: " << SDL_GetError() << std::endl;
+		exit(-2);
 		throw Exception("Invalid BMP export path!");
 	}
 	return true;
@@ -71,17 +73,29 @@ void Formatter::export_composite_operation_xml(const CompositeOperation& cop, co
 CompositeOperation Formatter::import_composite_operation_xml(const std::string& filename) {
 	tinyxml2::XMLDocument xml_doc;
 	XMLError eResult = xml_doc.LoadFile(filename.c_str());
-	if (eResult != XML_SUCCESS) throw Exception("Cannot open XML File!");
+	if (eResult != XML_SUCCESS) {
+		exit(-3);
+		throw Exception("Cannot open XML File!");
+	}
 
 	XMLNode* root = xml_doc.FirstChild();
-	if (root == nullptr) throw Exception("XML File Corrupted!");
+	if (root == nullptr) { 
+		exit(-4);
+		throw Exception("XML File Corrupted!"); 
+	}
 
 	XMLElement* comp_op = root->FirstChildElement("Composite_Operation");
-	if (comp_op == nullptr) throw Exception("XML File Corrupted!");
+	if (comp_op == nullptr) { 
+		exit(-5);
+		throw Exception("XML File Corrupted!"); 
+	}
 
 	int Operation_Count;
 	eResult = comp_op->QueryIntAttribute("Operation_Count", &Operation_Count);
-	if(eResult != XML_SUCCESS) throw Exception("XML File Corrupted!");
+	if (eResult != XML_SUCCESS) {
+		exit(-6);
+		throw Exception("XML File Corrupted!"); 
+	}
 
 	std::queue<std::pair<std::string, int>> queue;
 
@@ -96,7 +110,10 @@ CompositeOperation Formatter::import_composite_operation_xml(const std::string& 
 		int oper;
 		XMLElement* Operand = op->FirstChildElement("Operand");
 		eResult = Operand->QueryIntText(&oper);
-		if (eResult != XML_SUCCESS) throw Exception("XML File Corrupted!");
+		if (eResult != XML_SUCCESS) {
+			exit(-7);
+			throw Exception("XML File Corrupted!");
+		}
 
 		queue.push(std::make_pair(opcode, oper));
 
@@ -105,14 +122,12 @@ CompositeOperation Formatter::import_composite_operation_xml(const std::string& 
 	return CompositeOperation(queue);
 }
 
-void Formatter::export_project(Image* image, const std::string& path) {
+void Formatter::export_project(Image* image, const std::string& path, std::string dir = "res/") {
 
 	if (path.substr(path.find_last_of(".") + 1) != "xml") {
 		std::cout << "Wrong file format!" << std::endl;
 		return;
 	}
-
-	std::string dir = "res/";
 
 	tinyxml2::XMLDocument xml_doc;
 	XMLNode* root = xml_doc.NewElement("Root");
@@ -148,9 +163,9 @@ void Formatter::export_project(Image* image, const std::string& path) {
 
 	root->InsertEndChild(selection_list);
 
-	std::string project = dir + path;
+	std::string project = dir + "/" + path;
 	XMLError eResult = xml_doc.SaveFile(project.c_str());
-	if (eResult != XML_SUCCESS) throw Exception("Couldn't create XML File!");
+	if (eResult != XML_SUCCESS) { exit(-9); throw Exception("Couldn't create XML File!"); }
 }
 
 Image* Formatter::import_project(std::string filename) {

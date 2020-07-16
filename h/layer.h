@@ -28,6 +28,8 @@ public:
 
 	void perform_operation_whole_layer(Operation& operation);
 
+	std::string path;
+
 private:
 	SDL_Surface* surface_ = nullptr;
 	SDL_Rect rect_;

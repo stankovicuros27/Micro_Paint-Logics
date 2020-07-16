@@ -35,7 +35,7 @@ void perform_composite_operation(Image** image);
 void save_image(Image** image);
 void save_project(Image** image);
 void load_existing_project(Image** image);
-void argc_mode(char** argv);
+void argc_mode(int argc, char** argv);
 
 int main(int argc, char **argv) {
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	int option;
 
 	try {
-		if (argc == 3) argc_mode(argv);
+		if (argc == 3 || argc == 4 || argc == 5) argc_mode(argc, argv);
 	}
 	catch (Exception& e) {
 		std::cout << e.what() << std::endl;

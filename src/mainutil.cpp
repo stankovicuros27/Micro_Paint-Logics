@@ -455,7 +455,7 @@ void save_project(Image** image) {
 		std::string file_name;
 		std::cin >> file_name;
 		if (file_name.substr(file_name.find_last_of(".") + 1) == "xml") {
-			Formatter::export_project((*image), file_name);
+			Formatter::export_project((*image), file_name, "res/");
 		}
 		else std::cout << "Unsupported file extension!" << std::endl;
 	}
@@ -477,34 +477,103 @@ void load_existing_project(Image** image) {
 }
 
 
-void argc_mode(char** argv) {
-	Image image;
-	std::string img;
-	img.append(argv[1]);
-	image.add_layer(0, 0, img, 100);
+void argc_mode(int argc, char** argv) {
 
-	std::string oper;
-	oper.append(argv[2]);
+	if (argc == 3) {
+		Image image;
+		std::string img;
+		img.append(argv[1]);
+		image.add_layer(0, 0, img, 100);
 
-	if (oper == "median") {
-		Operation op("median", 0);
-		image.perform_operation(op);
+		std::string oper;
+		oper.append(argv[2]);
+
+		if (oper == "median") {
+			Operation op("median", 0);
+			image.perform_operation(op);
+		}
+		else {
+			CompositeOperation operation(Formatter::import_composite_operation_xml(oper));
+			image.perform_operation(operation);
+		}
+
+
+		std::string file_name = img;
+
+		if (file_name.substr(file_name.find_last_of(".") + 1) == "pam") {
+			Formatter::export_pam(image.get_surface(), file_name);
+		}
+		else if (file_name.substr(file_name.find_last_of(".") + 1) == "bmp") {
+			Formatter::export_bmp(image.get_surface(), file_name);
+		}
+		else std::cout << "Unsupported file extension!" << std::endl;
 	}
-	else{
-		CompositeOperation operation(Formatter::import_composite_operation_xml(oper));
-		image.perform_operation(operation);
-	}
+	else if (argc == 4) {
+		std::string project;
+		project.append(argv[1]);
+		Image *image = Formatter::import_project(project);
 
+		std::string oper;
+		oper.append(argv[2]);
+		if (oper == "median") {
+			Operation op("median", 0);
+			image->perform_operation(op);
+		}
+		else {
+			CompositeOperation operation(Formatter::import_composite_operation_xml(oper));
+			image->perform_operation(operation);
+		}
 
-	std::string file_name = img;
+		std::string dir = argv[3];
+		Formatter::export_project(image, project, dir);
+	}
+	
+	else if (argc == 5) {
 
-	if (file_name.substr(file_name.find_last_of(".") + 1) == "pam") {
-		Formatter::export_pam(image.get_surface(), file_name);
+		std::string code;
+		code.append(argv[1]);
+
+		if (code == "ProjectToImage") {
+			std::string project;
+			project.append(argv[2]);
+			Image* image = Formatter::import_project(project);
+
+			std::string path;
+			path.append(argv[3]);
+
+			if (path.substr(path.find_last_of(".") + 1) == "bmp") {
+				Formatter::export_bmp(image->get_surface(), path);
+			}
+
+			else if (path.substr(path.find_last_of(".") + 1) == "pam") {
+				Formatter::export_pam(image->get_surface(), path);
+			}
+		}
+
+		else if (code == "ImageOpacity") {
+			std::string path;
+			path.append(argv[2]);
+			Image image;
+
+			std::string opacityS;
+			opacityS.append(argv[3]);
+			int opacity = atoi(opacityS.c_str());
+
+			image.add_layer(0, 0, path, opacity);
+
+			if (path.substr(path.find_last_of(".") + 1) == "bmp") {
+				std::string newPath = path.substr(0, path.size() - 4);
+				newPath.append("Opacity.bmp");
+				Formatter::export_bmp(image.get_surface(), newPath);
+			}
+
+			else if (path.substr(path.find_last_of(".") + 1) == "pam") {
+				std::string newPath = path.substr(0, path.size() - 4);
+				newPath.append("Opacity.pam");
+				Formatter::export_pam(image.get_surface(), newPath);
+			}
+		}
 	}
-	else if (file_name.substr(file_name.find_last_of(".") + 1) == "bmp") {
-		Formatter::export_bmp(image.get_surface(), file_name);
-	}
-	else std::cout << "Unsupported file extension!" << std::endl;
 
 	exit(0);
 }

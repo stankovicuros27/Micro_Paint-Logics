@@ -74,6 +74,8 @@ void Image::add_layer(int x, int y, const std::string& path, int opacity) {
 		Operation operation("opacity", opacity);
 		layer->perform_operation_whole_layer(operation);
 	}
+
+	layer->path = path;
 	
 	blit_layers();
 }
@@ -178,7 +180,7 @@ void Image::perform_operation(Operation &operation) {
 
 void Image::perform_operation_whole_image(Operation& operation) {
 	std::for_each(layers_.begin(), layers_.end(), [&](Layer* layer) {
-		if(layer->is_active()) layer->perform_operation_whole_layer(operation);
+		layer->perform_operation_whole_layer(operation);
 	});
 	blit_layers();
 }

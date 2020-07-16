@@ -17,7 +17,7 @@ public:
 	static void export_composite_operation_xml(const CompositeOperation& cop, const std::string &filename);
 	static CompositeOperation import_composite_operation_xml(const std::string& filename);
 
-	static void export_project(Image* image, const std::string &path);
+	static void export_project(Image* image, const std::string &path, std::string dir);
 	static Image* import_project(std::string filename);
 };
 
